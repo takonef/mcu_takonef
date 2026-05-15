@@ -74,6 +74,15 @@ void get_temp_callback(){
     printf("%f\n", temp_C);
 }
 
+void tm_start_callback(){
+    adc_task_set_state(ADC_TASK_STATE_RUN);
+}
+
+void tm_stop_callback(){
+    adc_task_set_state(ADC_TASK_STATE_IDLE);
+}
+
+
 api_t device_api[] =
 {
 	{"version", version_callback, "get device name and firmware version"},
@@ -86,6 +95,8 @@ api_t device_api[] =
     {"wmem", wmem_callback, "write memory"},
     {"get_adc", get_adc_callback, "get current voltage"},
     {"get_temp", get_temp_callback, "get current temperature"},
+    {"tm_start", tm_start_callback, "starts the temperature and voltage measures"},
+    {"tm_stop", tm_stop_callback, "stops the temperature and voltage measures"},
 	{NULL, NULL, NULL},
 };
 
@@ -113,6 +124,7 @@ int main()
     while (1){
         comm = stdio_task_handle();
         led_task_handle();
+        adc_task_handle();
         protocol_task_handle(comm);
     }
 }

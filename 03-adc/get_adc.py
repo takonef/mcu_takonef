@@ -6,8 +6,8 @@ def read_value(ser):
 	while True:
 		try:
 			line = ser.readline().decode('ascii')
-			value = float(line)
-			return value
+			v, t = map(float, line.split())
+			return v, t
 		except ValueError:
 			continue
 
@@ -23,15 +23,13 @@ def main():
     measure_voltage_V = []
     measure_ts = []
 
+    ser.write("tm_start\n".encode('ascii'))
     start_ts = time.time()
     try:
         while True:
+            
             ts = time.time() - start_ts
-            ser.write("get_adc\n".encode('ascii'))
-            voltage_V = read_value(ser)
-
-            ser.write("get_temp\n".encode('ascii'))
-            temp_C = read_value(ser)
+            voltage_V, temp_C = read_value(ser)
 
             measure_ts.append(ts)
             measure_voltage_V.append(voltage_V)
@@ -41,6 +39,7 @@ def main():
             time.sleep(0.1)
 
     finally:
+        ser.write("tm_stop\n".encode('ascii'))
         ser.close()
         print("Port closed")
 
